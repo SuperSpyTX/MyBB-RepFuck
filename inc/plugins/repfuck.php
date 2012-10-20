@@ -213,14 +213,17 @@ function repfuck_action()
     $dopeeversmoked = "User has been repfucked successfully";
     $error = false;
     
-    verify_post_check($mybb->input['my_post_key']);
+    if (!verify_post_check($mybb->input['my_post_key'], true)) {
+        $dopeeversmoked = "Invalid authorization match!";
+        $error = true;
+    }
     
     if(!in_array($mybb->user['usergroup'], explode(",", $mybb->settings['repfuckgids']))) {
         error_no_permission();
     }
     
     $useruid = intval($mybb->input['rfuid']);
-    if($useruid == 0) {
+    if($useruid == 0 && !$error) {
         $dopeeversmoked = "Invalid User ID!";
         $error = true;
     }
@@ -266,6 +269,8 @@ function repfuck_action()
         </html>";
         
     if(!$error) {
+        $db->query("DELETE FROM `".TABLE_PREFIX."reputation` WHERE uid=".$useruid." AND adduid=".$mybb->user['uid'].""); // delete own reputation to prevent multireps.
+        
         if($mybb->settings['repfucktakerep'] == 1) {
             $db->query("DELETE FROM `".TABLE_PREFIX."reputation` WHERE uid=".$useruid." AND reputation NOT LIKE '-%' ORDER BY `dateline` DESC");
         }
