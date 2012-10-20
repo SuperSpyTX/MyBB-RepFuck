@@ -1,0 +1,1 @@
+This plugin can be used on MultiForum forums and websites commercially or not, but cannot be redistributed to other sites without permission.
